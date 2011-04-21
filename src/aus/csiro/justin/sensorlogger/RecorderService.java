@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.OutputStreamWriter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -57,9 +58,7 @@ public class RecorderService extends BoundService {
     //private float[] mOrientation = new float[3];
     private SensorManager manager;
     private FileOutputStream stream;
-    private OutputStreamWriter writer;
-    private FileOutputStream tmpstream;
-	private OutputStreamWriter tmpwriter;
+	private OutputStreamWriter writer;
     
 
     private Timer timer;
@@ -213,7 +212,7 @@ public class RecorderService extends BoundService {
           accelValues[SensorManager.DATA_Y] + "," +
           accelValues[SensorManager.DATA_Z];
           
-          if (hasGyro)
+          if (hasGyro) {
         	  recordedData += "," +
         	  gyroValues[SensorManager.DATA_X] + "," +
         	  gyroValues[SensorManager.DATA_Y] + "," +
@@ -221,46 +220,33 @@ public class RecorderService extends BoundService {
         	  orientationValues[SensorManager.DATA_X] + "," +
         	  orientationValues[SensorManager.DATA_Y] + "," +
         	  orientationValues[SensorManager.DATA_Z] + "& ";
-          else
+        	  Log.d("Sensor Logger", Arrays.toString(gyroValues));
+          }
+          else {
         	  recordedData += "," +
         	  magValues[SensorManager.DATA_X] + "," +
         	  magValues[SensorManager.DATA_Y] + "," +
         	  magValues[SensorManager.DATA_Z] + "," +
         	  orientationValues[SensorManager.DATA_X] + "," +
         	  orientationValues[SensorManager.DATA_Y] + "," +
-        	  orientationValues[SensorManager.DATA_Z] + "& "; 
+        	  orientationValues[SensorManager.DATA_Z] + "& ";
+          }
 
 
         	writer.write(System.currentTimeMillis() + ":" + recordedData);
         	
-        	tmpwriter.write(System.currentTimeMillis() + ":" +
-                    accelValues[SensorManager.DATA_X] + "," +
-                    accelValues[SensorManager.DATA_Y] + "," +
-                    accelValues[SensorManager.DATA_Z] + "," +
-                    magValues[SensorManager.DATA_X] + "," +
-                    magValues[SensorManager.DATA_Y] + "," +
-                    magValues[SensorManager.DATA_Z] + "," +
-                    orientationValues[SensorManager.DATA_X] + "," +
-                    orientationValues[SensorManager.DATA_Y] + "," +
-                    orientationValues[SensorManager.DATA_Z] + "&" + 
-//                    mGData[0]+","+mGData[1]+","+mGData[2]+","+
-                    " ");
             
         	if (++i % 50 == 0) {
             	writer.flush();
         	}
-        	if (i % 50 == 0) {
-            	
-            	tmpwriter.flush();
-
-            }
+        	
         	//if data file size is around 1Mb when assumed 800byte for each row(800*10000=800Kb)
         	//make another file and write on in.
         	if(i%10000==0){
         		File file = getFileStreamPath("tmpsensors"+index+".log");
         		index++;
-                tmpstream = openFileOutput("tmpsensors"+index+".log", MODE_WORLD_READABLE);
-    			tmpwriter = new OutputStreamWriter(tmpstream);
+                stream = openFileOutput("tmpsensors"+index+".log", MODE_WORLD_READABLE);
+    			writer = new OutputStreamWriter(stream);
         	}
 
             if (service.getState()==20) {
@@ -301,10 +287,8 @@ public class RecorderService extends BoundService {
     private int index =0;
     public void init() {
         try {
-        	stream = openFileOutput("sensors.log", MODE_WORLD_READABLE);
-            writer = new OutputStreamWriter(stream);
-            tmpstream = openFileOutput("tmpsensors"+index+".log", MODE_WORLD_READABLE);
-			tmpwriter = new OutputStreamWriter(tmpstream);
+            stream = openFileOutput("tmpsensors"+index+".log", MODE_WORLD_READABLE);
+			writer = new OutputStreamWriter(stream);
         } catch (FileNotFoundException ex) {
             return;
         }
@@ -329,10 +313,15 @@ public class RecorderService extends BoundService {
         
         List<Sensor> typedSensors = manager.getSensorList(Sensor.TYPE_GYROSCOPE);
         if(typedSensors.size() != 0)
-        {	manager.registerListener(gyroListener, typedSensors.get(0),
+        {
+        	manager.registerListener(gyroListener, typedSensors.get(0),
         			SensorManager.SENSOR_DELAY_FASTEST);
         	hasGyro = true;
+        	Log.d("Sensor Logger", "Gyroscope available");
+        } else {
+        	Log.d("Sensor Logger", "Gyroscope not available");
         }
+        
         manager.registerListener(accelListener,
                 manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_FASTEST);

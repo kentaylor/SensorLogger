@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: /Users/amir/Documents/workspace/MOBILEAPP/SensorLogger/src/aus/csiro/justin/sensorlogger/rpc/SensorLoggerBinder.aidl
+ * Original file: C:\\android\\git-rep\\SensorLogger\\src\\aus\\csiro\\justin\\sensorlogger\\rpc\\SensorLoggerBinder.aidl
  */
 package aus.csiro.justin.sensorlogger.rpc;
 /**

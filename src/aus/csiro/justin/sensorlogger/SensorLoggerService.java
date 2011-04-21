@@ -162,7 +162,7 @@ public class SensorLoggerService extends Service {
     void doSetState(final int newState) {
         switch (newState) {
             case 2:
-                countdown = 5;
+                countdown = 10;
 
                 handler.removeCallbacks(countdownTask);
                 handler.postDelayed(countdownTask, 1000);
