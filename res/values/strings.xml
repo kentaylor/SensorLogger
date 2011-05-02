@@ -69,5 +69,13 @@
         <item>Cancel</item>
     </string-array>
 
-
+    <string-array name="handset_location">
+        <item>Top pocket</item>
+        <item>Front pants pocket</item>
+        <item>Back pants pocket</item>
+        <item>Backpack</item>
+        <item>Belt</item>
+        <item>Handbag</item>
+        <item>Other</item>
+    </string-array>
 </resources>
