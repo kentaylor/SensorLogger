@@ -21,6 +21,7 @@ public final class R {
         public static final int countdownblurb=0x7f070002;
         public static final int countdownheader=0x7f070000;
         public static final int countdowntimer=0x7f070001;
+        public static final int editTextComment=0x7f070017;
         public static final int intro1=0x7f070004;
         public static final int intro2=0x7f070005;
         public static final int intro3=0x7f070006;
@@ -40,25 +41,28 @@ public final class R {
         public static final int status=0x7f07000c;
         public static final int status_1=0x7f07000d;
         public static final int stop=0x7f07000b;
-        public static final int thanksblurb=0x7f070017;
-        public static final int thanksheader=0x7f070016;
-        public static final int thankslink=0x7f070019;
-        public static final int thankslinktext=0x7f070018;
+        public static final int submitBTN=0x7f070018;
+        public static final int textView1=0x7f070016;
+        public static final int thanksblurb=0x7f07001a;
+        public static final int thanksheader=0x7f070019;
+        public static final int thankslink=0x7f07001c;
+        public static final int thankslinktext=0x7f07001b;
     }
     public static final class layout {
         public static final int countdown=0x7f030000;
         public static final int intro=0x7f030001;
         public static final int list_item=0x7f030002;
-        public static final int main=0x7f030003;
-        public static final int recording=0x7f030004;
-        public static final int resultactivities=0x7f030005;
-        public static final int results=0x7f030006;
+        public static final int recording=0x7f030003;
+        public static final int resultactivities=0x7f030004;
+        public static final int results=0x7f030005;
+        public static final int submit=0x7f030006;
         public static final int thanks=0x7f030007;
     }
     public static final class raw {
         public static final int basic_model=0x7f040000;
     }
     public static final class string {
+        public static final int Submitbtn=0x7f050025;
         public static final int activity_dancing=0x7f05001f;
         public static final int activity_idle_sitting=0x7f050021;
         public static final int activity_idle_standing=0x7f050020;

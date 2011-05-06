@@ -78,4 +78,5 @@
         <item>Handbag</item>
         <item>Other</item>
     </string-array>
+        <string name="Submitbtn">Submit</string>
 </resources>

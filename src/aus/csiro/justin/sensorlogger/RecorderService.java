@@ -189,48 +189,47 @@ public class RecorderService extends BoundService {
         	
         	//TODO: Change when justin updates his web app.
         	
-//        	recordedData = accelValues[SensorManager.DATA_X] + "," +
-//            accelValues[SensorManager.DATA_Y] + "," +
-//            accelValues[SensorManager.DATA_Z] + "," +
-//            magValues[SensorManager.DATA_X] + "," +
-//            magValues[SensorManager.DATA_Y] + "," +
-//            magValues[SensorManager.DATA_Z] + "," +
-//            orientationValues[SensorManager.DATA_X] + "," +
-//            orientationValues[SensorManager.DATA_Y] + "," +
-//            orientationValues[SensorManager.DATA_Z];
-//        	
-//        	if (hasGyro)
-//        		recordedData += "," + gyroValues[SensorManager.DATA_X] + "," +
-//        		gyroValues[SensorManager.DATA_Y] + "," +
-//        		gyroValues[SensorManager.DATA_Z] + "& ";
-//        	else
-//        		recordedData += "& ";
-//          ;
+        	recordedData = accelValues[SensorManager.DATA_X] + "," +
+            accelValues[SensorManager.DATA_Y] + "," +
+            accelValues[SensorManager.DATA_Z] + "," +
+            magValues[SensorManager.DATA_X] + "," +
+            magValues[SensorManager.DATA_Y] + "," +
+            magValues[SensorManager.DATA_Z] + "," +
+            orientationValues[SensorManager.DATA_X] + "," +
+            orientationValues[SensorManager.DATA_Y] + "," +
+            orientationValues[SensorManager.DATA_Z];
+        	
+        	if (hasGyro)
+        		recordedData += "," + gyroValues[SensorManager.DATA_X] + "," +
+        		gyroValues[SensorManager.DATA_Y] + "," +
+        		gyroValues[SensorManager.DATA_Z] + "& ";
+        	else
+        		recordedData += ",0,0,0& ";
 
         //TODO: Remove this blog with the top block when just web app is updated.	
-          recordedData = accelValues[SensorManager.DATA_X] + "," +
-          accelValues[SensorManager.DATA_Y] + "," +
-          accelValues[SensorManager.DATA_Z];
-          
-          if (hasGyro) {
-        	  recordedData += "," +
-        	  gyroValues[SensorManager.DATA_X] + "," +
-        	  gyroValues[SensorManager.DATA_Y] + "," +
-        	  gyroValues[SensorManager.DATA_Z] + "," +           
-        	  orientationValues[SensorManager.DATA_X] + "," +
-        	  orientationValues[SensorManager.DATA_Y] + "," +
-        	  orientationValues[SensorManager.DATA_Z] + "& ";
-        	  Log.d("Sensor Logger", Arrays.toString(gyroValues));
-          }
-          else {
-        	  recordedData += "," +
-        	  magValues[SensorManager.DATA_X] + "," +
-        	  magValues[SensorManager.DATA_Y] + "," +
-        	  magValues[SensorManager.DATA_Z] + "," +
-        	  orientationValues[SensorManager.DATA_X] + "," +
-        	  orientationValues[SensorManager.DATA_Y] + "," +
-        	  orientationValues[SensorManager.DATA_Z] + "& ";
-          }
+//          recordedData = accelValues[SensorManager.DATA_X] + "," +
+//          accelValues[SensorManager.DATA_Y] + "," +
+//          accelValues[SensorManager.DATA_Z];
+//          
+//          if (hasGyro) {
+//        	  recordedData += "," +
+//        	  gyroValues[SensorManager.DATA_X] + "," +
+//        	  gyroValues[SensorManager.DATA_Y] + "," +
+//        	  gyroValues[SensorManager.DATA_Z] + "," +           
+//        	  orientationValues[SensorManager.DATA_X] + "," +
+//        	  orientationValues[SensorManager.DATA_Y] + "," +
+//        	  orientationValues[SensorManager.DATA_Z] + "& ";
+//        	  Log.d("Sensor Logger", Arrays.toString(gyroValues));
+//          }
+//          else {
+//        	  recordedData += "," +
+//        	  magValues[SensorManager.DATA_X] + "," +
+//        	  magValues[SensorManager.DATA_Y] + "," +
+//        	  magValues[SensorManager.DATA_Z] + "," +
+//        	  orientationValues[SensorManager.DATA_X] + "," +
+//        	  orientationValues[SensorManager.DATA_Y] + "," +
+//        	  orientationValues[SensorManager.DATA_Z] + "& ";
+//          }
 
 
         	writer.write(System.currentTimeMillis() + ":" + recordedData);

@@ -23,6 +23,13 @@ interface SensorLoggerBinder {
      * 7 - upload complete
      * 8 - finished
      */
+    void setClassfication(String strClss);
+    
+    void setLocation(String strClss);
+    
+    void setComment(String strClss);
+    
+     
     void setState(int state);
 	
 	void setIndex(int index);
@@ -31,7 +38,7 @@ interface SensorLoggerBinder {
 
     void submit();
 
-    void submitWithCorrection(String correction);
+    void submitWithCorrection(String correction,String loc,String cmnt);
 
     String getClassification();
 

@@ -24,6 +24,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -82,6 +83,18 @@ public class ResultsActivity extends ListActivity {
 		handler.postDelayed(task, 500);
 	}
 
+	// The activity has three data entry stages:
+	//	1. Activity Label
+	//  2. Handset location
+	//  3. Possible comment
+	static int dataEntryStage = 1;
+	
+	static String strCategory = "";
+	static String strLocation = "";
+	static String strComment = "";
+	static ListView lv;
+	String[] countries;
+	String[] locations;
 	/** {@inheritDoc} */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -92,102 +105,201 @@ public class ResultsActivity extends ListActivity {
 		// calls the service bind initially that then calls serviceBound here and expects
 		// the layout.
 		//setContentView(R.layout.list_item);
-		String[] countries = getResources().getStringArray(R.array.activity_list);
-
+		countries = getResources().getStringArray(R.array.activity_list);
+		locations = getResources().getStringArray(R.array.handset_location);
 		startService(new Intent(this, SensorLoggerService.class));
-
 		bindService(new Intent(this, SensorLoggerService.class), connection,
 				BIND_AUTO_CREATE);
 
-		setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, countries));
-
-		ListView lv = getListView();
+		lv = getListView();
 		lv.setTextFilterEnabled(true);
+
+		switch (dataEntryStage) {
+		case 1:
+			setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, countries));
+
+			break;
+		case 2:
+			setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, locations));
+
+			break;
+		default:
+			break;
+		}
+
+
+
+
+
+
 
 		lv.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				// When clicked, show a toast with the TextView text
-				String strCategory = ((TextView) view).getText().toString().toUpperCase();
 				try {
-					if(strCategory.compareTo("CANCEL") == 0)
-					{
-						service.setState(1);
+					switch (dataEntryStage) {
+					case 1:
+						strCategory = ((TextView) view).getText().toString().toUpperCase();
+						if(strCategory.compareTo("CANCEL") == 0)
+						{
+							service.setState(0);
 
-						Toast.makeText(getApplicationContext(), "Canceled recording, logger goes to count down",
-								Toast.LENGTH_SHORT).show();
-						setResult(RESULT_OK);
+							Toast.makeText(getApplicationContext(), "Canceled recording, logger goes to count down",
+									Toast.LENGTH_SHORT).show();
+							setResult(RESULT_OK);
 
+						}
+						else 
+						{
+							Toast.makeText(getApplicationContext(), ((TextView) view).getText().toString().toUpperCase() + " data",
+									Toast.LENGTH_LONG).show();
+							
+							dataEntryStage++;
+							service.setClassfication(strCategory);
+							service.setState(15);
+						}
+						
+						break;
+					case 2:
+						strLocation = ((TextView) view).getText().toString().toUpperCase();
+						dataEntryStage++;
+						service.setLocation(strLocation);
+						service.setState(25);
+
+						break;
+
+					default:
+						break;
 					}
-					else
-					{
-						Toast.makeText(getApplicationContext(), "Uploading " +((TextView) view).getText().toString().toUpperCase() + " data",
-								Toast.LENGTH_LONG).show();
-						setResult(RESULT_OK);
 
-						service.submitWithCorrection("CLASSIFIED/"+strCategory);
-					}
-				} catch (RemoteException e) {
-					Log.e(getClass().getName(), "Unable to set state", e);
-				}
+
+
+
+			} catch (RemoteException e) {
+				Log.e(getClass().getName(), "Unable to set state", e);
 			}
-		});
+		}
+	});
 
 
 		//String[] countries = getResources().getStringArray(R.array.activity_list);
 
 		//((Button) findViewById(R.id.resultsyes)).setOnClickListener(yesListener);
 		//((Button) findViewById(R.id.resultsno)).setOnClickListener(noListener);
-	}
+}
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
+@Override
+protected void onDestroy() {
+	super.onDestroy();
 
-		unbindService(connection);
+	unbindService(connection);
 
-	}
+}
 
-	void checkStage() {
-		try {
-			if (service.getState() == 7) {
-				FlurryAgent.onEvent("results_to_thanks");
+void checkStage() {
+	try {
+		if (service.getState() == 7) {
+			FlurryAgent.onEvent("results_to_thanks");
 
-				service.setState(8);
-				startActivity(new Intent(this, ThanksActivity.class));
-				finish();
-			}
-			else if (service.getState() == 1)
-			{
-				FlurryAgent.onEvent("results_to_countdown");
-
-				service.setState(2);
-				startActivity(new Intent(this, CountdownActivity.class));
-				finish();
-
-			}
-			else {
-				handler.postDelayed(task, 100);
-			}
-		} catch (RemoteException ex) {
-			Log.e(getClass().getName(), "Unable to get state", ex);
+			service.setState(8);
+			startActivity(new Intent(this, ThanksActivity.class));
+			finish();
 		}
+		else if (service.getState() == 0)
+		{
+			FlurryAgent.onEvent("results_to_countdown");
+
+			service.setState(1);
+			startActivity(new Intent(this, IntroActivity.class));
+			finish();
+
+		}
+		else if (service.getState() == 15)
+		{
+			startActivity(new Intent(this,ResultsActivity.class));
+			service.setState(18);
+
+//			setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, locations));
+//			lv.setOnItemClickListener(new OnItemClickListener() {
+//			public void onItemClick(AdapterView<?> parent, View view,
+//					int position, long id) {
+//				try {
+//					switch (dataEntryStage) {
+//					case 1:
+//						strCategory = ((TextView) view).getText().toString().toUpperCase();
+//						if(strCategory.compareTo("CANCEL") == 0)
+//						{
+//							service.setState(0);
+//
+//							Toast.makeText(getApplicationContext(), "Canceled recording, logger goes to count down",
+//									Toast.LENGTH_SHORT).show();
+//							setResult(RESULT_OK);
+//
+//						}
+//						else 
+//						{
+//							Toast.makeText(getApplicationContext(), ((TextView) view).getText().toString().toUpperCase() + " data",
+//									Toast.LENGTH_LONG).show();
+//							dataEntryStage++;
+//							service.setState(15);
+//						}
+//						break;
+//					case 2:
+//						strLocation = ((TextView) view).getText().toString().toUpperCase();
+//						dataEntryStage++;
+//						service.setState(25);
+//
+//						break;
+//					case 3:
+//						service.setState(25);
+//					default:
+//						break;
+//					}
+//
+//
+//
+//
+//			} catch (RemoteException e) {
+//				Log.e(getClass().getName(), "Unable to set state", e);
+//			}
+//		}
+//	});
+			
+
+		}
+		else if(service.getState() == 25)
+		{
+			startActivity(new Intent(this,SubmitRecordedData.class));
+			
+			
+//			setResult(RESULT_OK);
+//
+//			service.submitWithCorrection("CLASSIFIED/"+strCategory,strLocation,strComment);
+
+		}
+		
+		else {
+			handler.postDelayed(task, 100);
+		}
+	} catch (RemoteException ex) {
+		Log.e(getClass().getName(), "Unable to get state", ex);
 	}
+}
 
-	/** {@inheritDoc} */
-	@Override
-	protected void onStart() {
-		super.onStart();
+/** {@inheritDoc} */
+@Override
+protected void onStart() {
+	super.onStart();
 
-		FlurryAgent.onStartSession(this, "TFBJJPQUQX3S1Q6IUHA6");
-	}
+	FlurryAgent.onStartSession(this, "TFBJJPQUQX3S1Q6IUHA6");
+}
 
-	/** {@inheritDoc} */
-	@Override
-	protected void onStop() {
-		super.onStop();
+/** {@inheritDoc} */
+@Override
+protected void onStop() {
+	super.onStop();
 
-		FlurryAgent.onEndSession(this);
-	}
+	FlurryAgent.onEndSession(this);
+}
 
 }

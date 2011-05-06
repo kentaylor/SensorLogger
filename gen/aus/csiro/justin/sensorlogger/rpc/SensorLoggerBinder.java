@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: C:\\android\\git-rep\\SensorLogger\\src\\aus\\csiro\\justin\\sensorlogger\\rpc\\SensorLoggerBinder.aidl
+ * Original file: /Users/amir/Documents/workspace/MOBILEAPP/SensorLogger/src/aus/csiro/justin/sensorlogger/rpc/SensorLoggerBinder.aidl
  */
 package aus.csiro.justin.sensorlogger.rpc;
 /**
@@ -46,6 +46,33 @@ case INTERFACE_TRANSACTION:
 reply.writeString(DESCRIPTOR);
 return true;
 }
+case TRANSACTION_setClassfication:
+{
+data.enforceInterface(DESCRIPTOR);
+java.lang.String _arg0;
+_arg0 = data.readString();
+this.setClassfication(_arg0);
+reply.writeNoException();
+return true;
+}
+case TRANSACTION_setLocation:
+{
+data.enforceInterface(DESCRIPTOR);
+java.lang.String _arg0;
+_arg0 = data.readString();
+this.setLocation(_arg0);
+reply.writeNoException();
+return true;
+}
+case TRANSACTION_setComment:
+{
+data.enforceInterface(DESCRIPTOR);
+java.lang.String _arg0;
+_arg0 = data.readString();
+this.setComment(_arg0);
+reply.writeNoException();
+return true;
+}
 case TRANSACTION_setState:
 {
 data.enforceInterface(DESCRIPTOR);
@@ -85,7 +112,11 @@ case TRANSACTION_submitWithCorrection:
 data.enforceInterface(DESCRIPTOR);
 java.lang.String _arg0;
 _arg0 = data.readString();
-this.submitWithCorrection(_arg0);
+java.lang.String _arg1;
+_arg1 = data.readString();
+java.lang.String _arg2;
+_arg2 = data.readString();
+this.submitWithCorrection(_arg0, _arg1, _arg2);
 reply.writeNoException();
 return true;
 }
@@ -151,6 +182,51 @@ return DESCRIPTOR;
      * 7 - upload complete
      * 8 - finished
      */
+public void setClassfication(java.lang.String strClss) throws android.os.RemoteException
+{
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeString(strClss);
+mRemote.transact(Stub.TRANSACTION_setClassfication, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+}
+public void setLocation(java.lang.String strClss) throws android.os.RemoteException
+{
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeString(strClss);
+mRemote.transact(Stub.TRANSACTION_setLocation, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+}
+public void setComment(java.lang.String strClss) throws android.os.RemoteException
+{
+android.os.Parcel _data = android.os.Parcel.obtain();
+android.os.Parcel _reply = android.os.Parcel.obtain();
+try {
+_data.writeInterfaceToken(DESCRIPTOR);
+_data.writeString(strClss);
+mRemote.transact(Stub.TRANSACTION_setComment, _data, _reply, 0);
+_reply.readException();
+}
+finally {
+_reply.recycle();
+_data.recycle();
+}
+}
 public void setState(int state) throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
@@ -210,13 +286,15 @@ _reply.recycle();
 _data.recycle();
 }
 }
-public void submitWithCorrection(java.lang.String correction) throws android.os.RemoteException
+public void submitWithCorrection(java.lang.String correction, java.lang.String loc, java.lang.String cmnt) throws android.os.RemoteException
 {
 android.os.Parcel _data = android.os.Parcel.obtain();
 android.os.Parcel _reply = android.os.Parcel.obtain();
 try {
 _data.writeInterfaceToken(DESCRIPTOR);
 _data.writeString(correction);
+_data.writeString(loc);
+_data.writeString(cmnt);
 mRemote.transact(Stub.TRANSACTION_submitWithCorrection, _data, _reply, 0);
 _reply.readException();
 }
@@ -294,15 +372,18 @@ _data.recycle();
 return _result;
 }
 }
-static final int TRANSACTION_setState = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);
-static final int TRANSACTION_setIndex = (android.os.IBinder.FIRST_CALL_TRANSACTION + 1);
-static final int TRANSACTION_submitClassification = (android.os.IBinder.FIRST_CALL_TRANSACTION + 2);
-static final int TRANSACTION_submit = (android.os.IBinder.FIRST_CALL_TRANSACTION + 3);
-static final int TRANSACTION_submitWithCorrection = (android.os.IBinder.FIRST_CALL_TRANSACTION + 4);
-static final int TRANSACTION_getClassification = (android.os.IBinder.FIRST_CALL_TRANSACTION + 5);
-static final int TRANSACTION_getState = (android.os.IBinder.FIRST_CALL_TRANSACTION + 6);
-static final int TRANSACTION_getIndex = (android.os.IBinder.FIRST_CALL_TRANSACTION + 7);
-static final int TRANSACTION_getCountdownTime = (android.os.IBinder.FIRST_CALL_TRANSACTION + 8);
+static final int TRANSACTION_setClassfication = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);
+static final int TRANSACTION_setLocation = (android.os.IBinder.FIRST_CALL_TRANSACTION + 1);
+static final int TRANSACTION_setComment = (android.os.IBinder.FIRST_CALL_TRANSACTION + 2);
+static final int TRANSACTION_setState = (android.os.IBinder.FIRST_CALL_TRANSACTION + 3);
+static final int TRANSACTION_setIndex = (android.os.IBinder.FIRST_CALL_TRANSACTION + 4);
+static final int TRANSACTION_submitClassification = (android.os.IBinder.FIRST_CALL_TRANSACTION + 5);
+static final int TRANSACTION_submit = (android.os.IBinder.FIRST_CALL_TRANSACTION + 6);
+static final int TRANSACTION_submitWithCorrection = (android.os.IBinder.FIRST_CALL_TRANSACTION + 7);
+static final int TRANSACTION_getClassification = (android.os.IBinder.FIRST_CALL_TRANSACTION + 8);
+static final int TRANSACTION_getState = (android.os.IBinder.FIRST_CALL_TRANSACTION + 9);
+static final int TRANSACTION_getIndex = (android.os.IBinder.FIRST_CALL_TRANSACTION + 10);
+static final int TRANSACTION_getCountdownTime = (android.os.IBinder.FIRST_CALL_TRANSACTION + 11);
 }
 /**
      * Sets the state of the sensor binder application.
@@ -316,11 +397,14 @@ static final int TRANSACTION_getCountdownTime = (android.os.IBinder.FIRST_CALL_T
      * 7 - upload complete
      * 8 - finished
      */
+public void setClassfication(java.lang.String strClss) throws android.os.RemoteException;
+public void setLocation(java.lang.String strClss) throws android.os.RemoteException;
+public void setComment(java.lang.String strClss) throws android.os.RemoteException;
 public void setState(int state) throws android.os.RemoteException;
 public void setIndex(int index) throws android.os.RemoteException;
 public void submitClassification(java.lang.String classification) throws android.os.RemoteException;
 public void submit() throws android.os.RemoteException;
-public void submitWithCorrection(java.lang.String correction) throws android.os.RemoteException;
+public void submitWithCorrection(java.lang.String correction, java.lang.String loc, java.lang.String cmnt) throws android.os.RemoteException;
 public java.lang.String getClassification() throws android.os.RemoteException;
 public int getState() throws android.os.RemoteException;
 public int getIndex() throws android.os.RemoteException;
