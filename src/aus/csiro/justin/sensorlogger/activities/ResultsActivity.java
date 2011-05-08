@@ -139,7 +139,7 @@ public class ResultsActivity extends ListActivity {
 				try {
 					switch (dataEntryStage) {
 					case 1:
-						strCategory = ((TextView) view).getText().toString().toUpperCase();
+						strCategory = "CLASSIFIED/" + ((TextView) view).getText().toString().toUpperCase();
 						if(strCategory.compareTo("CANCEL") == 0)
 						{
 							service.setState(0);
