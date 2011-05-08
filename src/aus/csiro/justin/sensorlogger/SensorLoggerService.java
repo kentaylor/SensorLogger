@@ -93,11 +93,11 @@ public class SensorLoggerService extends Service {
 
         public void submit() throws RemoteException {
             final Intent intent = new Intent(SensorLoggerService.this, UploaderService.class);
-            intent.putExtra("correction", correction);
-            intent.putExtra("activity", getClassification());
-            intent.putExtra("version", getVersionName());
-            intent.putExtra("application", "SensorLogger");
-            intent.putExtra("imei", getIMEI());
+            intent.putExtra("x-correction", correction);
+            intent.putExtra("x-activity", getClassification());
+            intent.putExtra("x-version", getVersionName());
+            intent.putExtra("x-application", "SensorLogger");
+            intent.putExtra("x-imei", getIMEI());
             intent.putExtra("location", phoneLocation);
             intent.putExtra("comment", usrComment);
             setState(6);
