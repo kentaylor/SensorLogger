@@ -23,7 +23,11 @@ import org.apache.http.entity.FileEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import aus.csiro.justin.sensorlogger.R;
+import aus.csiro.justin.sensorlogger.activities.RecordingActivity;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -43,6 +47,8 @@ import android.util.Log;
 public class RecorderService extends BoundService {
 
     private static final String TAG = "SensorLoggerService";
+
+	private static final int ONGOING_NOTIFICATION_ID = 1;
 
     public static boolean STARTED = false;
     public boolean hasGyro = false;
@@ -277,6 +283,7 @@ public class RecorderService extends BoundService {
 
     @Override
     public void onStart(final Intent intent, final int startId) {
+    	
         super.onStart(intent, startId);
 
         STARTED = true;
@@ -345,6 +352,28 @@ public class RecorderService extends BoundService {
 				}
             }
         }, 500, 20);
+        
+		//	put on-going notification to show that service is running in the background
+		NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+
+		int icon = R.drawable.icon;
+		CharSequence tickerText = "Avocado Logger is recording";
+		long when = System.currentTimeMillis();
+		Notification notification = new Notification(icon, tickerText, when);
+		
+		notification.defaults = 0;
+		notification.flags = Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
+		
+		Context context = getApplicationContext();
+		CharSequence contentTitle = "Avocado Logger";
+		CharSequence contentText = "Avocado Logger service recording";
+		Intent notificationIntent = new Intent(this, RecordingActivity.class);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+		notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
+		
+		//notificationManager.notify(ONGOING_NOTIFICATION_ID, notification);
+		this.startForeground(ONGOING_NOTIFICATION_ID, notification);
+        
     }
 
     @Override

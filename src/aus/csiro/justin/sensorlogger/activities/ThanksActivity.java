@@ -6,8 +6,11 @@
 package aus.csiro.justin.sensorlogger.activities;
 
 import android.app.Activity;
+import android.app.Service;
+import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.view.KeyEvent;
 import android.widget.TextView;
 import com.flurry.android.FlurryAgent;
 
@@ -20,7 +23,28 @@ import aus.csiro.justin.sensorlogger.R;
  */
 public class ThanksActivity extends Activity {
 
-    /** {@inheritDoc} */
+   
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    if (keyCode == KeyEvent.KEYCODE_BACK
+	            && event.getRepeatCount() == 0) {
+	        event.startTracking();
+	        return true;
+	    }
+	    return super.onKeyDown(keyCode, event);
+	}
+	
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+	    if (keyCode == KeyEvent.KEYCODE_BACK && event.isTracking()
+	            && !event.isCanceled()) {
+			startActivity(new Intent(this,IntroActivity.class));
+	    	return true;
+	    }
+	    return super.onKeyUp(keyCode, event);
+	}
+	
+	/** {@inheritDoc} */
     @Override
     public void onCreate(final Bundle icicle) {
         super.onCreate(icicle);

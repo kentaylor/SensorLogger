@@ -134,7 +134,7 @@ public class SensorLoggerService extends Service {
     Map<String, Integer> classifications = new HashMap<String, Integer>();
     String correction = "UNCLASSIFIED/NOTCORRECTED";
     int classCount = 0;
-    int countdown = 10;
+    int countdown;
     int state = 1;
 
     public String getIMEI() {
@@ -184,7 +184,7 @@ public class SensorLoggerService extends Service {
     void doSetState(final int newState) {
         switch (newState) {
             case 2:
-                countdown = 3;
+                countdown = 10;
 
                 handler.removeCallbacks(countdownTask);
                 handler.postDelayed(countdownTask, 1000);

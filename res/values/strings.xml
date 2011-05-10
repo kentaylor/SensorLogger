@@ -79,4 +79,6 @@
         <item>Other</item>
     </string-array>
         <string name="Submitbtn">Submit</string>
+        <string name="user_name">Default</string>
+        <string name="prefbtn">Preferences</string>
 </resources>

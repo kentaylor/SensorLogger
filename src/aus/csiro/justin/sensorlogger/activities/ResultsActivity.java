@@ -5,6 +5,8 @@
 
 package aus.csiro.justin.sensorlogger.activities;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
@@ -95,6 +97,30 @@ public class ResultsActivity extends ListActivity {
 	static ListView lv;
 	String[] countries;
 	String[] locations;
+	AccountManager accountManager;
+	Account[] acntaUserNames;
+	String[] straUsrs;
+	
+	
+	public void FillUserNames()
+	{
+		int i = 0;
+		accountManager = (AccountManager)getSystemService(ACCOUNT_SERVICE);
+		try {
+			
+		acntaUserNames = accountManager.get(this).getAccounts();
+		} catch (Exception e) {
+			int ii = 1;
+			ii++;
+			// TODO: handle exception
+		}
+		straUsrs = new String[acntaUserNames.length];
+		
+		for (Account acnt : acntaUserNames) {
+			straUsrs[i++] = acnt.name;
+			
+		}
+	}
 	/** {@inheritDoc} */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -107,6 +133,8 @@ public class ResultsActivity extends ListActivity {
 		//setContentView(R.layout.list_item);
 		countries = getResources().getStringArray(R.array.activity_list);
 		locations = getResources().getStringArray(R.array.handset_location);
+		//FillUserNames();
+		
 		startService(new Intent(this, SensorLoggerService.class));
 		bindService(new Intent(this, SensorLoggerService.class), connection,
 				BIND_AUTO_CREATE);
@@ -139,7 +167,7 @@ public class ResultsActivity extends ListActivity {
 				try {
 					switch (dataEntryStage) {
 					case 1:
-						strCategory = "CLASSIFIED/" + ((TextView) view).getText().toString().toUpperCase();
+						strCategory = ((TextView) view).getText().toString().toUpperCase();
 						if(strCategory.compareTo("CANCEL") == 0)
 						{
 							service.setState(0);
@@ -155,7 +183,7 @@ public class ResultsActivity extends ListActivity {
 									Toast.LENGTH_LONG).show();
 							
 							dataEntryStage++;
-							service.setClassfication(strCategory);
+							service.setClassfication("CLASSIFIED/" + strCategory);
 							service.setState(15);
 						}
 						
