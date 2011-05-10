@@ -11,6 +11,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.view.KeyEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 import com.flurry.android.FlurryAgent;
 
@@ -21,19 +24,22 @@ import aus.csiro.justin.sensorlogger.R;
  * @author chris
  * modified by Justin
  */
-public class ThanksActivity extends Activity {
+public class ThanksActivity extends Activity implements OnClickListener {
 
    
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 	    if (keyCode == KeyEvent.KEYCODE_BACK
-	            && event.getRepeatCount() == 0) {
+	             && event.getRepeatCount() == 0) {
 	        event.startTracking();
 	        return true;
 	    }
+	    else if (keyCode == KeyEvent.KEYCODE_HOME) {
+			this.finish();
+	    	return true;
+	    }
 	    return super.onKeyDown(keyCode, event);
 	}
-	
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 	    if (keyCode == KeyEvent.KEYCODE_BACK && event.isTracking()
@@ -55,6 +61,8 @@ public class ThanksActivity extends Activity {
         //set URL for the web server
         final String code = "http://testingjungoo.appspot.com/read.jsp";
         ((TextView) findViewById(R.id.thankslink)).setText(code);
+        ((Button) findViewById(R.id.Exit)).setOnClickListener(this);
+        
         //Linkify.addLinks(((TextView) findViewById(R.id.viewcaption)), Linkify.WEB_URLS);
     }
 
@@ -93,5 +101,10 @@ public class ThanksActivity extends Activity {
 
         FlurryAgent.onEndSession(this);
     }
+	@Override
+	public void onClick(View v) {
+		this.finish();
+		System.exit(0);
+	}
 
 }

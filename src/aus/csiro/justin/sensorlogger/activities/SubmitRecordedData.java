@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -90,6 +91,27 @@ public class SubmitRecordedData extends BoundActivity implements OnClickListener
 			e.printStackTrace();
 		}// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    if (keyCode == KeyEvent.KEYCODE_BACK
+	            && event.getRepeatCount() == 0) {
+	        event.startTracking();
+	        return true;
+	    }
+	    return super.onKeyDown(keyCode, event);
+	}
+	
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+	    if (keyCode == KeyEvent.KEYCODE_BACK && event.isTracking()
+	            && !event.isCanceled()) {
+	    	ResultsActivity.dataEntryStage = 2;
+			startActivity(new Intent(this,ResultsActivity.class));
+	    	return true;
+	    }
+	    return super.onKeyUp(keyCode, event);
 	}
 
 }

@@ -18,6 +18,7 @@ public final class R {
         public static final int icon=0x7f020000;
     }
     public static final class id {
+        public static final int Exit=0x7f08001d;
         public static final int countdownblurb=0x7f080002;
         public static final int countdownheader=0x7f080000;
         public static final int countdowntimer=0x7f080001;
@@ -82,6 +83,7 @@ public final class R {
         public static final int countdownheader=0x7f060006;
         public static final int countdowninitial=0x7f060007;
         public static final int error_disconnected=0x7f060009;
+        public static final int exitbtn=0x7f060028;
         public static final int intro1=0x7f060002;
         public static final int intro2=0x7f060003;
         public static final int intro3=0x7f060004;

@@ -81,4 +81,5 @@
         <string name="Submitbtn">Submit</string>
         <string name="user_name">Default</string>
         <string name="prefbtn">Preferences</string>
+        <string name="exitbtn">Exit</string>
 </resources>
