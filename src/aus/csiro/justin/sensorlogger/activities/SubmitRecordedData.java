@@ -86,6 +86,7 @@ public class SubmitRecordedData extends BoundActivity implements OnClickListener
 			service.setComment(comment);
 			service.submit();
 			startActivity(new Intent(this,ThanksActivity.class));
+			finish();
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -109,6 +110,7 @@ public class SubmitRecordedData extends BoundActivity implements OnClickListener
 	            && !event.isCanceled()) {
 	    	ResultsActivity.dataEntryStage = 2;
 			startActivity(new Intent(this,ResultsActivity.class));
+			finish();
 	    	return true;
 	    }
 	    return super.onKeyUp(keyCode, event);

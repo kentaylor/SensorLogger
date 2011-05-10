@@ -210,11 +210,6 @@ public class ResultsActivity extends ListActivity {
 			}
 		});
 
-
-		//String[] countries = getResources().getStringArray(R.array.activity_list);
-
-		//((Button) findViewById(R.id.resultsyes)).setOnClickListener(yesListener);
-		//((Button) findViewById(R.id.resultsno)).setOnClickListener(noListener);
 	}
 
 	@Override
@@ -247,52 +242,7 @@ public class ResultsActivity extends ListActivity {
 			{
 				startActivity(new Intent(this,ResultsActivity.class));
 				service.setState(18);
-
-				//			setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, locations));
-				//			lv.setOnItemClickListener(new OnItemClickListener() {
-				//			public void onItemClick(AdapterView<?> parent, View view,
-				//					int position, long id) {
-				//				try {
-				//					switch (dataEntryStage) {
-				//					case 1:
-				//						strCategory = ((TextView) view).getText().toString().toUpperCase();
-				//						if(strCategory.compareTo("CANCEL") == 0)
-				//						{
-				//							service.setState(0);
-				//
-				//							Toast.makeText(getApplicationContext(), "Canceled recording, logger goes to count down",
-				//									Toast.LENGTH_SHORT).show();
-				//							setResult(RESULT_OK);
-				//
-				//						}
-				//						else 
-				//						{
-				//							Toast.makeText(getApplicationContext(), ((TextView) view).getText().toString().toUpperCase() + " data",
-				//									Toast.LENGTH_LONG).show();
-				//							dataEntryStage++;
-				//							service.setState(15);
-				//						}
-				//						break;
-				//					case 2:
-				//						strLocation = ((TextView) view).getText().toString().toUpperCase();
-				//						dataEntryStage++;
-				//						service.setState(25);
-				//
-				//						break;
-				//					case 3:
-				//						service.setState(25);
-				//					default:
-				//						break;
-				//					}
-				//
-				//
-				//
-				//
-				//			} catch (RemoteException e) {
-				//				Log.e(getClass().getName(), "Unable to set state", e);
-				//			}
-				//		}
-				//	});
+				finish();
 
 
 			}
@@ -300,12 +250,7 @@ public class ResultsActivity extends ListActivity {
 			{
 				startActivity(new Intent(this,SubmitRecordedData.class));
 				service.setState(18);
-
-
-				//			setResult(RESULT_OK);
-				//
-				//			service.submitWithCorrection("CLASSIFIED/"+strCategory,strLocation,strComment);
-
+				finish();
 			}
 
 			else {

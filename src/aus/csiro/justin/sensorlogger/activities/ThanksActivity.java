@@ -104,7 +104,7 @@ public class ThanksActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		this.finish();
-		System.exit(0);
+		//System.exit(0);
 	}
 
 }
