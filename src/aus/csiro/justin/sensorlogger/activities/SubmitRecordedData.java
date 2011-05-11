@@ -108,8 +108,9 @@ public class SubmitRecordedData extends BoundActivity implements OnClickListener
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 	    if (keyCode == KeyEvent.KEYCODE_BACK && event.isTracking()
 	            && !event.isCanceled()) {
-	    	ResultsActivity.dataEntryStage = 2;
+	    	ResultsActivity.dataEntryStage = stage.ENTERING_PHONE_LOCATION;
 			startActivity(new Intent(this,ResultsActivity.class));
+			
 			finish();
 	    	return true;
 	    }

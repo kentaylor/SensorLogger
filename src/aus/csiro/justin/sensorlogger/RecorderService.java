@@ -35,6 +35,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -51,23 +52,25 @@ public class RecorderService extends BoundService {
 	private static final int ONGOING_NOTIFICATION_ID = 1;
 
     public static boolean STARTED = false;
+	public static boolean bStopRecording = false;
+
     public boolean hasGyro = false;
 
     private float[] mags = new float[3];
     private float[] accels = new float[3];
     private float[] gyro = new float[3];
     private float[] mGData = new float[3];
-    //private float[] mMData = new float[3];
-    //private float[] mOData = new float[3];
     private float[] mR = new float[16];
     private float[] mI = new float[16];
-    //private float[] mOrientation = new float[3];
+
     private SensorManager manager;
     private FileOutputStream stream;
 	private OutputStreamWriter writer;
     
 
-    private Timer timer;
+    private Timer timerSensorSampler;
+    private Handler handlerSnsrSampler;
+    
 
     private volatile int i = 0;
     private float[] accelValues = new float[3],gyroValues = new float[3],
@@ -162,7 +165,7 @@ public class RecorderService extends BoundService {
         if (++nextSample % 64 == 0 && nextSample >= 128) {
             float[] cache = new float[256];
             System.arraycopy(data, 0, cache, 0, 256);
-            analyse(cache);
+            //analyse(cache);
         }
 
         write();
@@ -182,9 +185,7 @@ public class RecorderService extends BoundService {
         	mags=magValues;
         	if(mags != null && accels != null){
                 SensorManager.getRotationMatrix(mR, mI, accels, mags);
-//               
-//                SensorManager.getOrientation(mR, mOrientation);
-//                float incl = SensorManager.getInclination(mI);
+
                 mGData[0]=mR[0]*accels[0]+mR[1]*accels[1]+mR[2]*accels[2];
                 if(mGData[0]<0.00001 && mGData[0]>0 || mGData[0]>-0.00001 && mGData[0]<0) mGData[0]=0.0f;
                 mGData[1]=mR[4]*accels[0]+mR[5]*accels[1]+mR[6]*accels[2];
@@ -212,32 +213,6 @@ public class RecorderService extends BoundService {
         	else
         		recordedData += ",0,0,0& ";
 
-        //TODO: Remove this blog with the top block when just web app is updated.	
-//          recordedData = accelValues[SensorManager.DATA_X] + "," +
-//          accelValues[SensorManager.DATA_Y] + "," +
-//          accelValues[SensorManager.DATA_Z];
-//          
-//          if (hasGyro) {
-//        	  recordedData += "," +
-//        	  gyroValues[SensorManager.DATA_X] + "," +
-//        	  gyroValues[SensorManager.DATA_Y] + "," +
-//        	  gyroValues[SensorManager.DATA_Z] + "," +           
-//        	  orientationValues[SensorManager.DATA_X] + "," +
-//        	  orientationValues[SensorManager.DATA_Y] + "," +
-//        	  orientationValues[SensorManager.DATA_Z] + "& ";
-//        	  Log.d("Sensor Logger", Arrays.toString(gyroValues));
-//          }
-//          else {
-//        	  recordedData += "," +
-//        	  magValues[SensorManager.DATA_X] + "," +
-//        	  magValues[SensorManager.DATA_Y] + "," +
-//        	  magValues[SensorManager.DATA_Z] + "," +
-//        	  orientationValues[SensorManager.DATA_X] + "," +
-//        	  orientationValues[SensorManager.DATA_Y] + "," +
-//        	  orientationValues[SensorManager.DATA_Z] + "& ";
-//          }
-
-
         	writer.write(System.currentTimeMillis() + ":" + recordedData);
         	
             
@@ -245,21 +220,7 @@ public class RecorderService extends BoundService {
             	writer.flush();
         	}
         	
-        	//if data file size is around 1Mb when assumed 800byte for each row(800*10000=800Kb)
-        	//make another file and write on in.
-        	if(i%10000==0){
-        		File file = getFileStreamPath("tmpsensors"+index+".log");
-        		index++;
-                stream = openFileOutput("tmpsensors"+index+".log", MODE_WORLD_READABLE);
-    			writer = new OutputStreamWriter(stream);
-        	}
-
-            if (service.getState()==20) {
-            	
-                finished();
-                
-            }
-            
+           
         } catch (IOException ex) {
             Log.e(TAG, "Unable to write", ex);
         }
@@ -267,13 +228,6 @@ public class RecorderService extends BoundService {
 
     public void finished() {
         stopSelf();
-
-        try {
-        	service.setIndex(index);
-            service.setState(4);
-        } catch (RemoteException ex) {
-            Log.e(getClass().getName(), "Error changing state", ex);
-        }
     }
 
     @Override
@@ -291,6 +245,8 @@ public class RecorderService extends BoundService {
         init();
     }
     private int index =0;
+
+	
     public void init() {
         try {
             stream = openFileOutput("tmpsensors"+index+".log", MODE_WORLD_READABLE);
@@ -302,7 +258,9 @@ public class RecorderService extends BoundService {
         InputStream is = null;
         try {
             is = getResources().openRawResource(R.raw.basic_model);
-            model = (Map<Float[], String>) new ObjectInputStream(is).readObject();
+            
+            //A super slow process.
+            //model = (Map<Float[], String>) new ObjectInputStream(is).readObject();
         } catch (Exception ex) {
             Log.e(TAG, "Unable to load model", ex);
         } finally {
@@ -315,6 +273,51 @@ public class RecorderService extends BoundService {
             }
         }
 
+        RegisterSensors();
+        
+        timerSensorSampler = new Timer("Data logger");
+
+        timerSensorSampler.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+
+                try {
+                	//if(!bStopRecording)
+                		sample();
+                	//else
+                    //    stopSelf();
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+        }, 500, 20);
+        
+		//	put on-going notification to show that service is running in the background
+		NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+
+		int icon = R.drawable.icon_logger;
+		CharSequence tickerText = "Avocado Logger is recording";
+		long when = System.currentTimeMillis();
+		Notification notification = new Notification(icon, tickerText, when);
+		
+		notification.defaults = 0;
+		notification.flags = Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
+		
+		Context context = getApplicationContext();
+		CharSequence contentTitle = "Avocado Logger";
+		CharSequence contentText = "Avocado Logger service recording";
+		Intent notificationIntent = new Intent(this, RecordingActivity.class);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+		notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
+		
+		//notificationManager.notify(ONGOING_NOTIFICATION_ID, notification);
+		this.startForeground(ONGOING_NOTIFICATION_ID, notification);
+        
+    }
+    
+    public void RegisterSensors()
+    {
         manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         
         List<Sensor> typedSensors = manager.getSensorList(Sensor.TYPE_GYROSCOPE);
@@ -338,42 +341,6 @@ public class RecorderService extends BoundService {
                 manager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
                 SensorManager.SENSOR_DELAY_FASTEST);
 
-        timer = new Timer("Data logger");
-
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-
-                try {
-					sample();
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-            }
-        }, 500, 20);
-        
-		//	put on-going notification to show that service is running in the background
-		NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-
-		int icon = R.drawable.icon;
-		CharSequence tickerText = "Avocado Logger is recording";
-		long when = System.currentTimeMillis();
-		Notification notification = new Notification(icon, tickerText, when);
-		
-		notification.defaults = 0;
-		notification.flags = Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
-		
-		Context context = getApplicationContext();
-		CharSequence contentTitle = "Avocado Logger";
-		CharSequence contentText = "Avocado Logger service recording";
-		Intent notificationIntent = new Intent(this, RecordingActivity.class);
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-		notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
-		
-		//notificationManager.notify(ONGOING_NOTIFICATION_ID, notification);
-		this.startForeground(ONGOING_NOTIFICATION_ID, notification);
-        
     }
 
     @Override
@@ -383,9 +350,10 @@ public class RecorderService extends BoundService {
         manager.unregisterListener(accelListener);
         manager.unregisterListener(magneticListener);
         manager.unregisterListener(orientationListener);
-
-        timer.cancel();
-
+		this.stopForeground(true);
+        bStopRecording  = true;
+        timerSensorSampler.cancel();
+        timerSensorSampler.purge();
         STARTED = false;
     }
 

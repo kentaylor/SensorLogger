@@ -46,7 +46,7 @@ public class CountdownActivity extends BoundActivity {
 
 		setContentView(R.layout.countdown);
 		//Initializing the counddown task:
-		iCountDown = 10;
+		iCountDown = 11;
 		tskCountDown.run();
 	}
 
@@ -56,26 +56,22 @@ public class CountdownActivity extends BoundActivity {
 	}
 
 	public void updateCountdown() {
-		try {
 
-			if (iCountDown > 0) {
-				iCountDown--;
-				((TextView) findViewById(R.id.countdowntimer)).setText("" + iCountDown);
-				
-			}
-			//Only the first time this part runs, otherwise there will be few beeps and vibrations!
-			else if (iCountDown-- == 0){
-				FlurryAgent.onEvent("countdown_to_recording");
-				playAudio();
-				Vibrate();
-				startActivity(new Intent(this, RecordingActivity.class));
-				service.setState(3);
-				//Stopping the countdown:
-				tskCountDown.cancel();
-				finish();
-			}
-		} catch (RemoteException ex) {
-			Log.e(getClass().getName(), "Error updating countdown", ex);
+		if (iCountDown > 0) {
+			iCountDown--;
+			((TextView) findViewById(R.id.countdowntimer)).setText("" + iCountDown);
+
+		}
+		//Only the first time this part runs, otherwise there will be few beeps and vibrations!
+		else if (iCountDown-- == 0){
+			FlurryAgent.onEvent("countdown_to_recording");
+			playAudio();
+			Vibrate();
+			startActivity(new Intent(this, RecordingActivity.class));
+			//Stopping the countdown:
+			tskCountDown.cancel();
+
+			finish();
 		}
 	}
 
@@ -107,13 +103,13 @@ public class CountdownActivity extends BoundActivity {
 			Log.e("beep", "error: " + e.getMessage(), e);
 		}
 	}
-	
+
 	private void Vibrate()
 	{
 		Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-		v.vibrate(300);
+		v.vibrate(100);
 	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK
@@ -131,6 +127,7 @@ public class CountdownActivity extends BoundActivity {
 			try {
 				service.setState(0);
 				// Although the the task cancel method is called sometimes the timer does not stop.
+				// By setting iCountDown -1 we make sure the else clause in the updateCountDown does not execute.  
 				iCountDown = -1;
 				tskCountDown.cancel();
 			} catch (RemoteException e) {

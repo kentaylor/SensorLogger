@@ -43,6 +43,14 @@ import aus.csiro.justin.sensorlogger.rpc.SensorLoggerBinder;
  *
  * @author chris
  */
+enum stage {
+	CANCELED, // The cancel option is selected from the list
+	ENTERING_DATA_LABEL, // The list of activities is presented for user to choose
+	DATA_LABELED, // The activity label is clicked by the user
+	ENTERING_PHONE_LOCATION, // The list of locations is presented
+	TASK_FINISHED, // The location of the phone is specified.
+	ACTIVITY_STOPPED // finish method is called and the activity is destroyed.
+	};
 public class ResultsActivity extends ListActivity {
 
 	private final Handler handler = new Handler();
@@ -52,7 +60,9 @@ public class ResultsActivity extends ListActivity {
 	private final TimerTask task = new TimerTask() {
 		@Override
 		public void run() {
+			handler.postDelayed(task, 50);
 			checkStage();
+			
 		}
 	};
 
@@ -73,24 +83,24 @@ public class ResultsActivity extends ListActivity {
 
 	protected void serviceBound() {
 
-		try {
-			String name = "activity_" + service.getClassification().substring(11)
-			.replace("/", "_").toLowerCase();
+//		try {
+//			String name = "activity_" + service.getClassification().substring(11)
+//			.replace("/", "_").toLowerCase();
+//
+//			//int res = getResources().getIdentifier(name, "string", "aus.csiro.justin.sensorlogger");
+//			//((TextView) findViewById(R.id.resultsresultaaa)).setText(res);
+//		} catch (RemoteException ex) {
+//			Log.e(getClass().getName(), "Unable to get classification", ex);
+//		}
 
-			//int res = getResources().getIdentifier(name, "string", "aus.csiro.justin.sensorlogger");
-			//((TextView) findViewById(R.id.resultsresultaaa)).setText(res);
-		} catch (RemoteException ex) {
-			Log.e(getClass().getName(), "Unable to get classification", ex);
-		}
-
-		handler.postDelayed(task, 500);
+		//handler.postDelayed(task, 500);
 	}
 
 	// The activity has three data entry stages:
 	//	1. Activity Label
 	//  2. Handset location
 	//  3. Possible comment
-	static int dataEntryStage = 1;
+	public static stage dataEntryStage = stage.ENTERING_DATA_LABEL;
 
 	static String strCategory = "";
 	static String strLocation = "";
@@ -143,20 +153,28 @@ public class ResultsActivity extends ListActivity {
 		lv = getListView();
 		lv.setTextFilterEnabled(true);
 
+		handler.removeCallbacks(task);
+		handler.postDelayed(task, 50);
+
 		switch (dataEntryStage) {
-		case 1:
+		case ENTERING_DATA_LABEL:
+			
 			setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, countries));
-
 			break;
-		case 2:
+		case ENTERING_PHONE_LOCATION:
 			setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, locations));
+			
+			break;
 
-			break;
+		// This is the case when the dataEntryStage is set to ACTIVITY_STOPPED 
 		default:
+			setListAdapter(new ArrayAdapter<String>(this, R.layout.list_item, countries));
+			dataEntryStage = stage.ENTERING_DATA_LABEL;
 			break;
+
 		}
 
-
+		
 
 
 
@@ -167,41 +185,36 @@ public class ResultsActivity extends ListActivity {
 					int position, long id) {
 				try {
 					switch (dataEntryStage) {
-					case 1:
+					case ENTERING_DATA_LABEL:
 						strCategory = ((TextView) view).getText().toString().toUpperCase();
 						if(strCategory.compareTo("CANCEL") == 0)
 						{
-							service.setState(0);
-
-							Toast.makeText(getApplicationContext(), "Canceled recording, logger goes to count down",
+							Toast.makeText(getApplicationContext(), "Canceled recording, logger goes to intro",
 									Toast.LENGTH_SHORT).show();
-							setResult(RESULT_OK);
+							setResult(RESULT_CANCELED);
+							dataEntryStage = stage.CANCELED;
 
 						}
 						else 
 						{
-							Toast.makeText(getApplicationContext(), ((TextView) view).getText().toString().toUpperCase() + " data",
-									Toast.LENGTH_LONG).show();
+							String message = " Labaled as: " + ((TextView) view).getText().toString().toUpperCase();
+							Toast.makeText(getApplicationContext(), message,
+									Toast.LENGTH_SHORT).show();
 
-							dataEntryStage++;
 							service.setClassfication("CLASSIFIED/" + strCategory);
-							service.setState(15);
+							dataEntryStage = stage.DATA_LABELED;
 						}
 
 						break;
-					case 2:
+					case ENTERING_PHONE_LOCATION:
 						strLocation = ((TextView) view).getText().toString().toUpperCase();
-						dataEntryStage++;
 						service.setLocation(strLocation);
-						service.setState(25);
-
+						dataEntryStage = stage.TASK_FINISHED;
 						break;
 
 					default:
 						break;
 					}
-
-
 
 
 				} catch (RemoteException e) {
@@ -214,6 +227,8 @@ public class ResultsActivity extends ListActivity {
 
 	@Override
 	protected void onDestroy() {
+
+		handler.removeCallbacks(task);
 		super.onDestroy();
 
 		unbindService(connection);
@@ -221,44 +236,28 @@ public class ResultsActivity extends ListActivity {
 	}
 
 	void checkStage() {
-		try {
-			if (service.getState() == 7) {
-				FlurryAgent.onEvent("results_to_thanks");
-
-				service.setState(8);
-				startActivity(new Intent(this, ThanksActivity.class));
+			switch (dataEntryStage) {
+			case DATA_LABELED:
+				dataEntryStage = stage.ENTERING_PHONE_LOCATION;
+				startActivity(new Intent(this,ResultsActivity.class));
 				finish();
-			}
-			else if (service.getState() == 0)
-			{
-				FlurryAgent.onEvent("results_to_countdown");
+				break;
 
-				service.setState(1);
+			case TASK_FINISHED:
+				dataEntryStage = stage.ACTIVITY_STOPPED;
+				startActivity(new Intent(this,SubmitRecordedData.class));
+				finish();
+				break;
+				
+			case CANCELED:
+				dataEntryStage = stage.ENTERING_PHONE_LOCATION;
 				startActivity(new Intent(this, IntroActivity.class));
 				finish();
-
-			}
-			else if (service.getState() == 15)
-			{
-				startActivity(new Intent(this,ResultsActivity.class));
-				service.setState(18);
-				finish();
-
-
-			}
-			else if(service.getState() == 25)
-			{
-				startActivity(new Intent(this,SubmitRecordedData.class));
-				service.setState(18);
-				finish();
+				break;
+			default:
+				break;
 			}
 
-			else {
-				handler.postDelayed(task, 100);
-			}
-		} catch (RemoteException ex) {
-			Log.e(getClass().getName(), "Unable to get state", ex);
-		}
 	}
 
 	/** {@inheritDoc} */
@@ -291,21 +290,17 @@ public class ResultsActivity extends ListActivity {
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.isTracking()
 				&& !event.isCanceled()) {
-			if(dataEntryStage == 2)
-			{				
-				dataEntryStage = 1;
+			switch (dataEntryStage) {
+			case ENTERING_PHONE_LOCATION:
+				dataEntryStage = stage.ENTERING_DATA_LABEL;
 				startActivity(new Intent(this,ResultsActivity.class));
-			}
-			else
-			{
-				startActivity(new Intent(this,IntroActivity.class));
-				try {
-					service.setState(0);
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 				finish();
+				break;
+			case ENTERING_DATA_LABEL:
+				startActivity(new Intent(this, IntroActivity.class));
+				finish();
+				break;
+				
 			}
 			return true;
 		}

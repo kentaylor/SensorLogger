@@ -172,13 +172,6 @@ public class SensorLoggerService extends Service {
     }
     void doSetState(final int newState) {
         switch (newState) {
-            case 3:
-                startService(new Intent(SensorLoggerService.this, RecorderService.class));
-                break;
-            case 5:
-                //startActivity(new Intent(this, ResultsActivity.class));
-
-            	break;
             case 8:
                 ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancel(0);
                 stopSelf();
