@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -102,5 +103,26 @@ public class IntroActivity extends BoundActivity implements OnClickListener {
 
 		FlurryAgent.onEndSession(this);
 	}
+	
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK
+				&& event.getRepeatCount() == 0) {
+			event.startTracking();
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.isTracking()
+				&& !event.isCanceled()) {
+			finish();
+			return true;
+		}
+		return super.onKeyUp(keyCode, event);
+	}
+
+
 
 }

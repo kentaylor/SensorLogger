@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.RemoteException;
 import android.os.Vibrator;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.TextView;
 import com.flurry.android.FlurryAgent;
 import java.util.TimerTask;
@@ -28,10 +29,10 @@ public class CountdownActivity extends BoundActivity {
 	private int iCountDown;
 	private final Handler handler = new Handler();
 
-	private final TimerTask task = new TimerTask() {
+	private final TimerTask tskCountDown = new TimerTask() {
 		@Override
 		public void run() {
-			handler.postDelayed(task, 1000);
+			handler.postDelayed(tskCountDown, 1000);
 
 			updateCountdown();
 		}
@@ -46,7 +47,7 @@ public class CountdownActivity extends BoundActivity {
 		setContentView(R.layout.countdown);
 		//Initializing the counddown task:
 		iCountDown = 10;
-		task.run();
+		tskCountDown.run();
 	}
 
 	@Override
@@ -70,7 +71,7 @@ public class CountdownActivity extends BoundActivity {
 				startActivity(new Intent(this, RecordingActivity.class));
 				service.setState(3);
 				//Stopping the countdown:
-				task.cancel();
+				tskCountDown.cancel();
 				finish();
 			}
 		} catch (RemoteException ex) {
@@ -90,7 +91,6 @@ public class CountdownActivity extends BoundActivity {
 	@Override
 	protected void onStop() {
 		super.onStop();
-
 		FlurryAgent.onEndSession(this);
 	}
 
@@ -113,5 +113,36 @@ public class CountdownActivity extends BoundActivity {
 		Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 		v.vibrate(300);
 	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK
+				&& event.getRepeatCount() == 0) {
+			event.startTracking();
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.isTracking()
+				&& !event.isCanceled()) {
+			try {
+				service.setState(0);
+				// Although the the task cancel method is called sometimes the timer does not stop.
+				iCountDown = -1;
+				tskCountDown.cancel();
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			startActivity(new Intent(this,IntroActivity.class));
+			finish();
+			return true;
+		}
+		return super.onKeyUp(keyCode, event);
+	}
+
 
 }
