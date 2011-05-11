@@ -197,7 +197,7 @@ public class ResultsActivity extends ListActivity {
 						}
 						else 
 						{
-							String message = " Labaled as: " + ((TextView) view).getText().toString().toUpperCase();
+							String message = "Labaled as: " + ((TextView) view).getText().toString().toUpperCase();
 							Toast.makeText(getApplicationContext(), message,
 									Toast.LENGTH_SHORT).show();
 
