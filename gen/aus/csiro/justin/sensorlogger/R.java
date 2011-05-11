@@ -61,6 +61,7 @@ public final class R {
     }
     public static final class raw {
         public static final int basic_model=0x7f050000;
+        public static final int beep_mp3=0x7f050001;
     }
     public static final class string {
         public static final int Submitbtn=0x7f060025;

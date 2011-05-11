@@ -119,17 +119,6 @@ public class SensorLoggerService extends Service {
     };
 
     final Handler handler = new Handler();
-    final TimerTask countdownTask = new TimerTask() {
-
-        @Override
-        public void run() {
-            if (--countdown > 0) {
-                handler.postDelayed(countdownTask, 1000);
-            } else {
-                doSetState(3);
-            }
-        }
-    };
 
     Map<String, Integer> classifications = new HashMap<String, Integer>();
     String correction = "UNCLASSIFIED/NOTCORRECTED";
@@ -183,12 +172,6 @@ public class SensorLoggerService extends Service {
     }
     void doSetState(final int newState) {
         switch (newState) {
-            case 2:
-                countdown = 10;
-
-                handler.removeCallbacks(countdownTask);
-                handler.postDelayed(countdownTask, 1000);
-                break;
             case 3:
                 startService(new Intent(SensorLoggerService.this, RecorderService.class));
                 break;
